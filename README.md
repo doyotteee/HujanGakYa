@@ -1,4 +1,4 @@
-# CuacaMap 🌤️
+# HujanGakYa 🌤️
 
 Aplikasi pemetaan cuaca Indonesia menggunakan data BMKG dengan visualisasi interaktif.
 
