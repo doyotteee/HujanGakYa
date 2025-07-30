@@ -124,3 +124,6 @@ app.listen(PORT, () => {
   console.log(`📍 API available at: http://localhost:${PORT}/api`);
   console.log(`🌐 CORS enabled for all origins`);
 });
+
+// Export for Vercel
+module.exports = app;
