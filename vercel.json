@@ -19,6 +19,10 @@
       "dest": "/api/weather.js"
     },
     {
+      "src": "/api/search-desa",
+      "dest": "/api/search-desa.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },

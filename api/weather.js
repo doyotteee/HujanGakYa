@@ -18,17 +18,46 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Mock weather data untuk testing
+    // Try to load real weather controller
+    let weatherData;
+    try {
+      const WeatherController = require('../backend/controllers/weatherController');
+      const weatherController = new WeatherController();
+      
+      // Create mock req/res objects for controller
+      const mockReq = { query: { adm4 } };
+      const mockRes = {
+        json: (data) => { weatherData = data; },
+        status: function(code) { 
+          this.statusCode = code;
+          return this;
+        },
+        statusCode: 200
+      };
+      
+      await weatherController.getWeatherByAdm4(mockReq, mockRes);
+      
+      if (mockRes.statusCode === 200 && weatherData) {
+        return res.status(200).json(weatherData);
+      }
+      
+    } catch (controllerError) {
+      console.log('Controller not available, using mock data:', controllerError.message);
+    }
+
+    // Fallback to enhanced mock data
     const mockWeatherData = [
       {
-        location: 'Jakarta Barat',
+        location: `Location for ${adm4}`,
         adm4: adm4,
-        temperature: 28,
-        humidity: 65,
-        description: 'Berawan Sebagian',
-        lat: -6.1754,
-        lon: 106.8272,
-        timestamp: new Date().toISOString()
+        temperature: Math.floor(Math.random() * 10) + 25, // 25-35°C
+        humidity: Math.floor(Math.random() * 30) + 50, // 50-80%
+        description: ['Cerah', 'Berawan', 'Hujan Ringan', 'Berawan Sebagian'][Math.floor(Math.random() * 4)],
+        lat: -6.2 + (Math.random() * 4), // Random lat around Indonesia
+        lon: 106.8 + (Math.random() * 10), // Random lon around Indonesia
+        wind_speed: Math.floor(Math.random() * 15) + 5,
+        timestamp: new Date().toISOString(),
+        source: 'mock_data'
       }
     ];
 
