@@ -65,7 +65,6 @@ const Home = () => {
     const handleClickOutside = (event) => {
       // Check if click is outside search container
       if (!event.target.closest('.search-container') && showSuggestions) {
-        console.log('🎯 Click outside detected, hiding suggestions');
         setShowSuggestions(false);
         setSearchSuggestions([]);
       }
@@ -223,7 +222,6 @@ const Home = () => {
   };
   const handleSearchInput = async (value) => {
     setSearchQuery(value);
-    console.log('🔍 Search input:', value);
     
     // Hide suggestions when input is empty
     if (value.length === 0) {
@@ -239,13 +237,11 @@ const Home = () => {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ API Response:', data);
         
         if (data.success && data.data && data.data.length > 0) {
           const sortedResults = sortByRelevance(data.data, value);
           setSearchSuggestions(sortedResults.slice(0, 10));
           setShowSuggestions(true);
-          console.log('✅ Using API suggestions:', sortedResults.length);
           return;
         }
       }
@@ -360,16 +356,12 @@ const Home = () => {
   };
 
   const selectSuggestion = (suggestion) => {
-    console.log('🎯 Suggestion selected:', suggestion.nama_desa);
-    
     // Force immediate state update
     setShowSuggestions(false);
     setSearchSuggestions([]);
     
     // Set search query to just the village name (cleaner)
     setSearchQuery(suggestion.nama_desa);
-    
-    console.log('✅ Suggestion selection completed, dropdown hidden');
     
     // Load weather data for the selected location immediately
     handleSearch();
@@ -652,7 +644,6 @@ const Home = () => {
                 onChange={(e) => handleSearchInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 onFocus={() => {
-                  console.log('🎯 Input focused, showing suggestions');
                   setShowSuggestions(true);
                   // If no query, trigger search to show initial suggestions
                   if (searchQuery.length === 0) {
@@ -660,13 +651,11 @@ const Home = () => {
                   }
                 }}
                 onBlur={(e) => {
-                  console.log('🎯 Input blurred');
                   // Check if the click is inside suggestions dropdown
                   const isClickingInsideDropdown = e.relatedTarget && 
                     e.relatedTarget.closest('.search-suggestions-dropdown');
                   
                   if (!isClickingInsideDropdown) {
-                    console.log('🎯 Hiding suggestions - click outside');
                     setTimeout(() => {
                       setShowSuggestions(false);
                       setSearchSuggestions([]);
@@ -681,9 +670,6 @@ const Home = () => {
                 </div>
               )}
             
-              {/* Search Suggestions - Debug */}
-              {console.log('🎯 Render check:', { showSuggestions, suggestionsLength: searchSuggestions.length, searchQuery })}
-              
               {/* Search Suggestions - Only show when we have both suggestions AND showSuggestions is true */}
               {showSuggestions && searchSuggestions.length > 0 && (
                 <div className="search-suggestions-dropdown absolute top-full left-0 right-0 mt-1 bg-gray-800/95 backdrop-blur-sm rounded-lg border border-gray-600 shadow-xl z-[60] max-h-64 sm:max-h-80 overflow-y-auto">
@@ -704,14 +690,12 @@ const Home = () => {
                       onMouseDown={(e) => {
                         // Prevent blur event when clicking suggestion
                         e.preventDefault();
-                        console.log('👆 Mouse down on suggestion:', suggestion.nama_desa);
                         selectSuggestion(suggestion);
                       }}
                       onClick={(e) => {
                         // Additional onClick handler
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('🖱️ Clicked suggestion:', suggestion.nama_desa);
                       }}
                     >
                       <div className="flex items-start">
