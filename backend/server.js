@@ -11,12 +11,11 @@ const isDevelopment = NODE_ENV === 'development';
 
 console.log(`🚀 Starting CuacaMap Backend Server in ${NODE_ENV} mode...`);
 
-// CORS configuration untuk production
+// CORS configuration untuk development lokal
 const corsOptions = {
   origin: isDevelopment ? '*' : [
-    'https://hujangakya.vercel.app',
-    'https://*.vercel.app',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:3001'
   ],
   credentials: true,
   optionsSuccessStatus: 200
