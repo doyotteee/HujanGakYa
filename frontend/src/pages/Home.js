@@ -4,7 +4,7 @@ import * as api from '../services/api';
 import MapView from '../components/MapView';
 import WeatherVideoBackground from '../components/WeatherVideoBackground';
 import { generateAlerts } from '../utils/alertSystem';
-import { AlertBanner, AlertCard, EmergencyContacts } from '../components/AlertComponents';
+import { AlertBanner } from '../components/AlertComponents';
 
 // Mock data untuk fallback
 const mockWeatherData = {
@@ -50,7 +50,7 @@ const mockWeatherData = {
 };
 
 const Home = () => {
-  const [activeTab, setActiveTab] = useState('Temperature');
+  const [activeTab, setActiveTab] = useState('Cuaca');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState('');
   const [weatherData, setWeatherData] = useState(null);
@@ -322,39 +322,6 @@ const Home = () => {
     return 0;
   };
 
-  // Helper functions for wind and humidity
-  const getWindCategory = (speed) => {
-    if (speed < 6) return 'Tenang';
-    if (speed < 20) return 'Sepoi-sepoi';
-    if (speed < 30) return 'Sedang';
-    if (speed < 40) return 'Kencang';
-    return 'Sangat Kencang';
-  };
-
-  const getWindDirection = (degrees) => {
-    const directions = ['⬇️', '↙️', '⬅️', '↖️', '⬆️', '↗️', '➡️', '↘️'];
-    const index = Math.round(degrees / 45) % 8;
-    return directions[index];
-  };
-
-  const getWindDirectionText = (degrees) => {
-    if (degrees >= 337.5 || degrees < 22.5) return 'Utara';
-    if (degrees < 67.5) return 'Timur Laut';
-    if (degrees < 112.5) return 'Timur';
-    if (degrees < 157.5) return 'Tenggara';
-    if (degrees < 202.5) return 'Selatan';
-    if (degrees < 247.5) return 'Barat Daya';
-    if (degrees < 292.5) return 'Barat';
-    return 'Barat Laut';
-  };
-
-  const getHumidityCategory = (humidity) => {
-    if (humidity < 30) return 'Kering';
-    if (humidity < 50) return 'Normal';
-    if (humidity < 70) return 'Lembab';
-    return 'Sangat Lembab';
-  };
-
   const selectSuggestion = (suggestion) => {
     // Force immediate state update
     setShowSuggestions(false);
@@ -590,20 +557,6 @@ const Home = () => {
     data: getChartData()
   }];
 
-  const weeklyForecast = weatherData?.forecast?.slice(0, 6).map((day, index) => {
-    const firstForecast = day.forecasts?.[0];
-    return {
-      day: ['Today', 'Tomorrow', 'Wed', 'Thu', 'Fri', 'Sat'][index] || `Day ${index + 1}`,
-      icon: getWeatherIcon(firstForecast?.weather?.description),
-      temp: firstForecast?.temperature?.celsius ? `${firstForecast.temperature.celsius}°` : '25°'
-    };
-  }) || [
-    { day: 'Today', icon: '⛅', temp: '25°' },
-    { day: 'Tomorrow', icon: '🌤️', temp: '27°' },
-    { day: 'Wed', icon: '☀️', temp: '29°' },    { day: 'Thu', icon: '⛈️', temp: '23°' },
-    { day: 'Fri', icon: '🌧️', temp: '21°' },
-    { day: 'Sat', icon: '⛅', temp: '26°' }];
-
   return (
     <div className="min-h-screen flex flex-col relative" style={{ 
       fontFamily: 'Roboto, sans-serif',
@@ -748,74 +701,123 @@ const Home = () => {
             <button className="text-gray-300 hover:text-white">
             </button>
           </div>
-        </header>      {/* Main Content */}
-        <main className="flex-grow p-6 md:p-10">
+        </header>
+        
+        {/* Main Content */}
+        <main className="flex-grow p-3 sm:p-6 md:p-10">
           <div className="max-w-6xl mx-auto">
           
             {/* Hero Section */}
-            <section className="mb-8">
+            <section className="mb-6 sm:mb-8">
               <div className="w-full">
-                {/* Main Temperature Display */}
+                {/* Main Temperature Display - Mobile Optimized */}
                 <div className="w-full">
                   <div className="flex flex-col md:flex-row items-start justify-between">
-                    <div className="flex items-center mb-6 md:mb-0">
-                      <div className="w-24 h-24 md:w-32 md:h-32 mr-4 text-6xl md:text-7xl flex items-center justify-center">
-                        {getWeatherIcon(currentWeather.weather?.description)}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-8xl md:text-9xl font-bold text-white">
-                          {currentWeather.temperature?.celsius || '--'}°
-                        </span>
+                    <div className="w-full md:w-auto flex flex-col items-center md:items-start mb-6 md:mb-0">
+                      
+                      {/* Mobile: Centered Layout */}
+                      <div className="flex flex-col items-center md:flex-row md:items-start">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 mb-3 md:mb-0 md:mr-4 text-5xl sm:text-6xl md:text-7xl flex items-center justify-center">
+                          {getWeatherIcon(currentWeather.weather?.description)}
+                        </div>
                         
-                        {/* Wind Speed & Humidity - Smaller Display */}
-                        <div className="flex items-center space-x-4 mt-4">
-                          <div className="flex items-center">
-                            <span className="text-lg mr-2">💨</span>
-                            <div className="text-white">
-                              <span className="text-sm md:text-base font-medium">{currentWeather.wind?.speed || '3.7'}</span>
-                              <span className="text-xs text-white/70 ml-1">km/h</span>
+                        <div className="flex flex-col items-center md:items-start">
+                          <span className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-white text-center md:text-left">
+                            {currentWeather.temperature?.celsius || '--'}°
+                          </span>
+                          
+                          {/* Weather Description - Mobile: Below Temperature */}
+                          <p className="text-base sm:text-lg md:text-xl text-white font-medium mt-2 md:hidden text-center">
+                            {currentWeather.weather?.description || 'No data available'}
+                          </p>
+                          
+                          {/* Wind Speed & Humidity - Desktop: Right of Temperature */}
+                          <div className="hidden md:flex items-center space-x-6 mt-4">
+                            <div className="flex items-center">
+                              <span className="text-lg mr-2">💨</span>
+                              <div className="text-white">
+                                <span className="text-base font-medium">{currentWeather.wind?.speed || '11.3'}</span>
+                                <span className="text-xs text-white/70 ml-1">km/h</span>
+                              </div>
+                            </div>
+                            
+                            <div className="w-px h-5 bg-white/40"></div>
+                            
+                            <div className="flex items-center">
+                              <span className="text-lg mr-2">💧</span>
+                              <div className="text-white">
+                                <span className="text-base font-medium">{currentWeather.humidity || '58'}</span>
+                                <span className="text-xs text-white/70 ml-1">%</span>
+                              </div>
                             </div>
                           </div>
-                          
-                          <div className="w-px h-4 bg-white/40"></div>
-                          
-                          <div className="flex items-center">
-                            <span className="text-lg mr-2">💧</span>
-                            <div className="text-white">
-                              <span className="text-sm md:text-base font-medium">{currentWeather.humidity || '78'}</span>
-                              <span className="text-xs text-white/70 ml-1">%</span>
-                            </div>
+                        </div>
+                      </div>
+                        
+                      {/* Wind Speed & Humidity - Mobile Only: Centered Below */}
+                      <div className="flex md:hidden items-center justify-center space-x-6 sm:space-x-8 mt-4 w-full">
+                        <div className="flex items-center">
+                          <span className="text-lg sm:text-xl mr-2">💨</span>
+                          <div className="text-white text-center">
+                            <span className="text-sm sm:text-base font-medium">{currentWeather.wind?.speed || '3.7'}</span>
+                            <span className="text-xs text-white/70 ml-1">km/h</span>
+                          </div>
+                        </div>
+                        
+                        <div className="w-px h-5 bg-white/40"></div>
+                        
+                        <div className="flex items-center">
+                          <span className="text-lg sm:text-xl mr-2">💧</span>
+                          <div className="text-white text-center">
+                            <span className="text-sm sm:text-base font-medium">{currentWeather.humidity || '78'}</span>
+                            <span className="text-xs text-white/70 ml-1">%</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   
-                    <div className="text-right space-y-4">
-                      {/* Weather Description - Top Right */}
-                      <div className="text-right">
-                        <p className="text-lg md:text-xl text-white font-medium mb-2">
+                    <div className="w-full md:w-auto text-center md:text-right space-y-3 sm:space-y-4">
+                      {/* Location Header - Mobile: Centered, Desktop: Right */}
+                      <div className="text-center md:text-right">
+                        {/* Weather Description - Desktop Only */}
+                        <p className="hidden md:block text-lg md:text-xl text-white font-medium mb-2">
                           {currentWeather.weather?.description || 'No data available'}
                         </p>
-                        <div className="flex items-center justify-end">
+                        
+                        {/* Location Name */}
+                        <div className="flex items-center justify-center md:justify-end">
                           <span className="text-red-500 mr-2">📍</span>
-                          <h1 className="text-lg md:text-xl font-semibold text-white">
-                            {location.desa?.toUpperCase() || 'SELECT LOCATION'}, {location.provinsi?.toUpperCase() || ''}
+                          <h1 className="text-base sm:text-lg md:text-xl font-semibold text-white">
+                            {location.desa?.toUpperCase() || 'SELECT LOCATION'}
+                            {location.provinsi && `, ${location.provinsi?.toUpperCase()}`}
                           </h1>
                         </div>
                       </div>
                       
-                      {/* Location Details - Bottom Right */}
+                      {/* Location Details - Mobile: Full Width, Desktop: Bottom Right */}
                       {location.desa && (
                         <div className="backdrop-blur-xl bg-white/20 rounded-xl p-3 sm:p-4 border border-white/30 shadow-xl">
-                          <h3 className="text-white font-semibold mb-2 flex items-center text-xs sm:text-sm drop-shadow">
+                          <h3 className="text-white font-semibold mb-3 flex items-center justify-center md:justify-start text-xs sm:text-sm drop-shadow">
                             <span className="mr-2">🏢</span>
                             Location Details
                           </h3>
-                          <div className="text-xs text-white/80 space-y-1">
-                            <p><span className="text-white/60 font-medium">Desa:</span> {location.desa}</p>
-                            <p><span className="text-white/60 font-medium">Kecamatan:</span> {location.kecamatan}</p>
-                            <p><span className="text-white/60 font-medium">Kabupaten:</span> {location.kotkab || location.kabupaten}</p>
-                            <p><span className="text-white/60 font-medium">Provinsi:</span> {location.provinsi}</p>
+                          <div className="text-xs sm:text-sm text-white/80 space-y-1.5">
+                            <div className="flex justify-between">
+                              <span className="text-white/60 font-medium">Desa:</span>
+                              <span className="text-right">{location.desa}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60 font-medium">Kecamatan:</span>
+                              <span className="text-right">{location.kecamatan}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60 font-medium">Kabupaten:</span>
+                              <span className="text-right">{location.kotkab || location.kabupaten}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60 font-medium">Provinsi:</span>
+                              <span className="text-right">{location.provinsi}</span>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -876,16 +878,16 @@ const Home = () => {
               )}
             </section>          {/* Weekly Forecast Section - Liquid Glass */}
             <section className="backdrop-blur-xl bg-white/20 p-3 sm:p-4 rounded-xl shadow-xl border border-white/30">
-              {/* Tab Navigation - Horizontal Scrollable */}
+              {/* Tab Navigation - Mobile Optimized */}
               <div className="relative border-b border-white/20 mb-3 sm:mb-4">
-                <div className="flex overflow-x-auto scrollbar-hide gap-1 pb-2 -mb-2">
-                  {['Temperature', 'Peringatan', 'Nomor Darurat', 'Lokasi', 'Wind', 'Humidity', 'Prakiraan'].map((tab) => (
+                <div className="flex overflow-x-auto scrollbar-hide gap-0 pb-2 -mb-2">
+                  {['Cuaca', 'Peringatan', 'Lokasi'].map((tab) => (
                     <button
                       key={tab}
-                      className={`flex-shrink-0 py-2 px-3 sm:px-4 text-sm sm:text-base font-semibold focus:outline-none transition-all duration-300 rounded-t-lg whitespace-nowrap ${
+                      className={`flex-1 min-w-0 py-3 sm:py-2 px-2 sm:px-4 text-sm sm:text-base font-semibold focus:outline-none transition-all duration-300 rounded-t-lg ${
                         activeTab === tab
                           ? 'text-white border-b-2 border-white bg-white/20'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                          : 'text-white/70 hover:text-white hover:bg-white/10 active:bg-white/15'
                       }`}
                       onClick={() => setActiveTab(tab)}
                     >
@@ -894,239 +896,415 @@ const Home = () => {
                   ))}
                 </div>
                 
-                {/* Scroll indicators */}
-                <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-white/20 to-transparent pointer-events-none sm:hidden"></div>
+                {/* Remove scroll indicators on mobile for cleaner look */}
               </div>
 
               {/* Tab Content */}
-              {activeTab === 'Temperature' && (
-                <div className="space-y-3">
-                  {/* Today and Tomorrow Cards */}
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                    <div className="backdrop-blur-md bg-white/20 rounded-xl p-3 border border-white/20 text-center">
-                      <h3 className="text-sm sm:text-base text-white/80 mb-2 font-medium">Today</h3>
-                      <div className="text-2xl sm:text-3xl mb-2">⛅</div>
-                      <p className="text-lg sm:text-xl font-bold text-white">{currentWeather.temperature?.celsius || '--'}°</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-white/20 rounded-xl p-3 border border-white/20 text-center">
-                      <h3 className="text-sm sm:text-base text-white/80 mb-2 font-medium">Tomorrow</h3>
-                      <div className="text-2xl sm:text-3xl mb-2">🌤️</div>
-                      <p className="text-lg sm:text-xl font-bold text-white">25°</p>
+              {activeTab === 'Cuaca' && (
+                <div className="space-y-3 sm:space-y-4">
+                  {/* Current Weather Summary - BMKG Data */}
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-3 sm:p-4 border border-white/30">
+                    <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 text-center sm:text-left">Data Cuaca Saat Ini (BMKG)</h3>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                      {/* Temperature (t field) */}
+                      <div className="text-center py-2 sm:py-0">
+                        <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                          {currentWeather.temperature?.celsius || '--'}°C
+                        </div>
+                        <div className="text-sm text-white/70">🌡️ Suhu</div>
+                      </div>
+                      
+                      {/* Weather Description (weather_desc field) */}
+                      <div className="text-center py-2 sm:py-0">
+                        <div className="text-2xl mb-1">
+                          {getWeatherIcon(currentWeather.weather?.description)}
+                        </div>
+                        <div className="text-sm text-white/90 font-medium">
+                          {currentWeather.weather?.description || 'Loading...'}
+                        </div>
+                        <div className="text-xs text-white/60">Kondisi Cuaca</div>
+                      </div>
+                      
+                      {/* Wind Speed (ws field) */}
+                      <div className="text-center py-2 sm:py-0">
+                        <div className="text-xl sm:text-2xl font-bold text-green-200 mb-1">
+                          {currentWeather.wind?.speed || '--'} km/h
+                        </div>
+                        <div className="text-sm text-white/70">💨 Kec. Angin</div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Weekly Forecast */}
-                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                    {weeklyForecast.map((day, index) => (
-                      <div key={index} className="p-2 rounded-lg backdrop-blur-md bg-white/15 hover:bg-white/25 transition-all duration-300 border border-white/20 text-center">
-                        <p className="text-xs text-white/80 mb-1 font-medium">{day.day}</p>
-                        <div className="text-xl sm:text-2xl mb-1">{day.icon}</div>
-                        <p className="text-sm font-bold text-white">{day.temp}</p>
+                  {/* Humidity Detail with Progress Bar */}
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 sm:p-6 border border-white/30">
+                    <h3 className="text-white font-semibold mb-4 flex items-center justify-center">
+                      <span className="mr-2">💧</span>
+                      Kelembaban Udara
+                    </h3>
+                    <div className="text-center">
+                      <div className="text-6xl font-bold text-white mb-4">
+                        {currentWeather.humidity || '46'}%
                       </div>
-                    ))}
+                      <div className="text-sm text-white/70 mb-4">
+                        Kategori: Normal
+                      </div>
+                      
+                      {/* Humidity Progress Bar */}
+                      <div className="w-full bg-white/20 rounded-full h-3 mb-4">
+                        <div 
+                          className="bg-gradient-to-r from-yellow-400 via-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
+                          style={{ width: `${currentWeather.humidity || 46}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hourly Forecast 3 Days - Scrollable */}
+                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-4 border border-white/30">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <span className="mr-2">📊</span>
+                      Prakiraan Detail 3 Hari
+                    </h3>
+                    
+                    <div className="overflow-x-auto hourly-forecast">
+                      <div className="flex gap-2 sm:gap-3 pb-2" style={{ minWidth: 'fit-content' }}>
+                        {(() => {
+                          // Process BMKG API data structure
+                          const allForecasts = [];
+                          
+                          // Extract data from BMKG API format
+                          if (weatherData?.data && Array.isArray(weatherData.data) && weatherData.data[0]?.cuaca) {
+                            const cuacaData = weatherData.data[0].cuaca;
+                            
+                            // Process each day (3 days total)
+                            cuacaData.forEach((dayArray, dayIndex) => {
+                              if (Array.isArray(dayArray)) {
+                                dayArray.forEach(forecast => {
+                                  if (forecast && forecast.t !== undefined && forecast.weather_desc) {
+                                    allForecasts.push({
+                                      temperature: forecast.t,
+                                      datetime: forecast.local_datetime || forecast.datetime,
+                                      weather: forecast.weather_desc,
+                                      humidity: forecast.hu,
+                                      wind_speed: forecast.ws,
+                                      dayIndex: dayIndex
+                                    });
+                                  }
+                                });
+                              }
+                            });
+                          }
+                          
+                          // If no API data, create demo data to show the interface
+                          if (allForecasts.length === 0) {
+                            const now = new Date();
+                            for (let i = 0; i < 20; i++) {
+                              const forecastTime = new Date(now.getTime() + i * 3 * 60 * 60 * 1000);
+                              allForecasts.push({
+                                temperature: Math.round(25 + Math.random() * 8),
+                                datetime: forecastTime.toISOString(),
+                                weather: i < 8 ? 'Cerah' : i < 16 ? 'Cerah Berawan' : 'Berawan',
+                                humidity: Math.round(50 + Math.random() * 30),
+                                wind_speed: Math.round(2 + Math.random() * 8),
+                                dayIndex: Math.floor(i / 8)
+                              });
+                            }
+                          }
+                          
+                          // Sort by datetime
+                          allForecasts.sort((a, b) => {
+                            try {
+                              return new Date(a.datetime) - new Date(b.datetime);
+                            } catch (e) {
+                              return 0;
+                            }
+                          });
+                          
+                          return allForecasts.map((dataPoint, index) => {
+                            return (
+                              <div key={index} className="flex-shrink-0">
+                                
+                                <div className="bg-white/15 rounded-lg p-2 sm:p-3 text-center w-[75px] sm:w-[85px] h-[120px] sm:h-[140px] backdrop-blur-sm border border-white/30 hover:bg-white/20 transition-all duration-200 flex flex-col justify-between">
+                                  <div className="text-xs sm:text-sm text-white/90 font-semibold">
+                                    {(() => {
+                                      try {
+                                        const datetime = new Date(dataPoint.datetime);
+                                        return datetime.toLocaleTimeString('en-US', { 
+                                          hour: 'numeric', 
+                                          hour12: true 
+                                        });
+                                      } catch (e) {
+                                        const hour = (index % 8) * 3 + 6;
+                                        return hour >= 12 ? `${hour > 12 ? hour - 12 : hour} PM` : `${hour} AM`;
+                                      }
+                                    })()}
+                                  </div>
+                                  
+                                  <div className="text-lg sm:text-xl flex-grow flex items-center justify-center">
+                                    {getWeatherIcon(dataPoint.weather)}
+                                  </div>
+                                  
+                                  <div className="text-sm sm:text-lg font-bold text-white drop-shadow-lg">
+                                    {Math.round(dataPoint.temperature)}°C
+                                  </div>
+                                  
+                                  <div className="text-xs space-y-1">
+                                    <div className="text-blue-100 font-semibold drop-shadow">
+                                      💧 {Math.round(dataPoint.humidity)}%
+                                    </div>
+                                    <div className="text-green-100 font-semibold drop-shadow">
+                                      💨 {Math.round(dataPoint.wind_speed)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                    
+                    {loading && (
+                      <div className="text-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto mb-2"></div>
+                        <p className="text-white/70 text-sm">Memuat data prakiraan...</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Tab Peringatan - Alert System */}
+              {/* Tab Peringatan - Smart Weather Alerts */}
               {activeTab === 'Peringatan' && (
-                <div className="space-y-6">
-                  {alerts.length === 0 ? (
-                    <div className="backdrop-blur-xl bg-white/20 rounded-xl p-8 border border-white/30 text-center">
-                      <div className="text-6xl mb-4">✅</div>
-                      <h3 className="text-2xl font-bold text-green-200 mb-2">Kondisi Normal</h3>
-                      <p className="text-white/80">
-                        Tidak ada peringatan cuaca saat ini. Tetap pantau kondisi cuaca secara berkala.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {alerts.map((alert) => (
-                        <AlertCard key={alert.id} alert={alert} />
-                      ))}
-                    </div>
-                  )}
+                <div className="space-y-4">
+                  {(() => {
+                    // Analyze BMKG data for weather warnings
+                    const analyzeWeatherWarnings = () => {
+                      const warnings = [];
+                      
+                      if (weatherData?.data && weatherData.data[0]?.cuaca) {
+                        const allForecasts = [];
+                        
+                        // Collect all forecasts
+                        weatherData.data[0].cuaca.forEach((dayArray) => {
+                          if (Array.isArray(dayArray)) {
+                            dayArray.forEach(forecast => {
+                              if (forecast) {
+                                allForecasts.push({
+                                  datetime: forecast.local_datetime || forecast.datetime,
+                                  weather_desc: forecast.weather_desc,
+                                  wind_speed: forecast.ws,
+                                  temperature: forecast.t,
+                                  humidity: forecast.hu,
+                                  tp: forecast.tp // precipitation
+                                });
+                              }
+                            });
+                          }
+                        });
+
+                        // Check for Strong Wind Warning (>15 km/h)
+                        const strongWindForecasts = allForecasts.filter(f => f.wind_speed > 15);
+                        if (strongWindForecasts.length > 0) {
+                          const maxWind = Math.max(...strongWindForecasts.map(f => f.wind_speed));
+                          warnings.push({
+                            type: 'wind',
+                            level: maxWind > 25 ? 'high' : 'medium',
+                            title: 'PERINGATAN! ANGIN KENCANG',
+                            speed: maxWind,
+                            forecasts: strongWindForecasts
+                          });
+                        }
+
+                        // Check for Rain Potential
+                        const rainForecasts = allForecasts.filter(f => 
+                          f.weather_desc && (
+                            f.weather_desc.toLowerCase().includes('hujan') ||
+                            (f.tp && f.tp > 0)
+                          )
+                        );
+                        
+                        if (rainForecasts.length > 0) {
+                          // Calculate rain duration
+                          const firstRain = rainForecasts[0];
+                          const lastRain = rainForecasts[rainForecasts.length - 1];
+                          
+                          warnings.push({
+                            type: 'rain',
+                            level: rainForecasts.some(f => f.weather_desc?.toLowerCase().includes('lebat')) ? 'high' : 'medium',
+                            title: 'POTENSI HUJAN',
+                            startTime: firstRain.datetime,
+                            endTime: lastRain.datetime,
+                            forecasts: rainForecasts,
+                            totalHours: rainForecasts.length * 3 // assuming 3-hour intervals
+                          });
+                        }
+
+                        // Check for Extreme Temperature
+                        const hotForecasts = allForecasts.filter(f => f.temperature > 35);
+                        if (hotForecasts.length > 0) {
+                          warnings.push({
+                            type: 'heat',
+                            level: 'medium',
+                            title: 'CUACA PANAS',
+                            maxTemp: Math.max(...hotForecasts.map(f => f.temperature)),
+                            forecasts: hotForecasts
+                          });
+                        }
+                      }
+                      
+                      return warnings;
+                    };
+
+                    const warnings = analyzeWeatherWarnings();
+
+                    return (
+                      <>
+                        {warnings.length === 0 ? (
+                          /* No Warnings - Normal Conditions */
+                          <div className="backdrop-blur-xl bg-green-900/30 rounded-xl p-6 border border-green-400/30 text-center">
+                            <div className="text-5xl mb-4">✅</div>
+                            <h3 className="text-xl font-bold text-green-200 mb-2">Kondisi Cuaca Normal</h3>
+                            <p className="text-white/80 text-sm">
+                              Tidak ada peringatan cuaca yang dikeluarkan BMKG saat ini.
+                            </p>
+                            <p className="text-green-200/70 text-xs mt-2">
+                              Tetap pantau kondisi cuaca secara berkala
+                            </p>
+                          </div>
+                        ) : (
+                          /* Display Warnings */
+                          <div className="space-y-3">
+                            {warnings.map((warning, index) => (
+                              <div key={index} className={`backdrop-blur-xl rounded-xl p-4 border ${
+                                warning.type === 'wind' ? 'bg-orange-900/40 border-orange-400/40' :
+                                  warning.type === 'rain' ? 'bg-blue-900/40 border-blue-400/40' :
+                                    warning.type === 'heat' ? 'bg-red-900/40 border-red-400/40' :
+                                      'bg-yellow-900/40 border-yellow-400/40'
+                              }`}>
+                                <div className="flex items-start gap-3">
+                                  <div className="text-2xl">
+                                    {warning.type === 'wind' ? '💨' :
+                                      warning.type === 'rain' ? '🌧️' :
+                                        warning.type === 'heat' ? '🌡️' : '⚠️'}
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className={`font-bold text-lg mb-2 ${
+                                      warning.type === 'wind' ? 'text-orange-200' :
+                                        warning.type === 'rain' ? 'text-blue-200' :
+                                          warning.type === 'heat' ? 'text-red-200' :
+                                            'text-yellow-200'
+                                    }`}>
+                                      {warning.title}
+                                    </h4>
+                                    
+                                    {warning.type === 'wind' && (
+                                      <div className="space-y-1">
+                                        <p className="text-white/90 font-medium">
+                                          Kecepatan Angin: <span className="text-orange-300">{warning.speed} km/jam</span>
+                                        </p>
+                                        <p className="text-white/70 text-sm">
+                                          {warning.level === 'high' ? '⚠️ Tinggi - Hindari aktivitas outdoor' : '⚠️ Sedang - Berhati-hati saat beraktivitas'}
+                                        </p>
+                                      </div>
+                                    )}
+                                    
+                                    {warning.type === 'rain' && (
+                                      <div className="space-y-1">
+                                        <p className="text-white/90 font-medium">
+                                          Prakiraan hujan dari jam{' '}
+                                          <span className="text-blue-300">
+                                            {(() => {
+                                              try {
+                                                return new Date(warning.startTime).toLocaleTimeString('id-ID', {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit'
+                                                });
+                                              } catch (e) {
+                                                return '15:00';
+                                              }
+                                            })()} 
+                                          </span>
+                                          {' hingga '}
+                                          <span className="text-blue-300">
+                                            {(() => {
+                                              try {
+                                                return new Date(warning.endTime).toLocaleTimeString('id-ID', {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit'
+                                                });
+                                              } catch (e) {
+                                                return '18:00';
+                                              }
+                                            })()}
+                                          </span>
+                                        </p>
+                                        <p className="text-white/70 text-sm">
+                                          ☔ Durasi: ~{warning.totalHours} jam • Siapkan payung/jas hujan
+                                        </p>
+                                      </div>
+                                    )}
+                                    
+                                    {warning.type === 'heat' && (
+                                      <div className="space-y-1">
+                                        <p className="text-white/90 font-medium">
+                                          Suhu Maksimal: <span className="text-red-300">{warning.maxTemp}°C</span>
+                                        </p>
+                                        <p className="text-white/70 text-sm">
+                                          🌡️ Cuaca panas - Perbanyak minum air, hindari sinar matahari langsung
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                   
-                  {/* Disaster Preparedness Tips */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4 flex items-center">
-                      <span className="mr-2">📚</span>
-                      Tips Kesiapsiagaan Bencana
+                  {/* Quick Action Tips */}
+                  <div className="backdrop-blur-xl bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h3 className="text-white font-semibold mb-3 flex items-center text-sm">
+                      <span className="mr-2">�</span>
+                      Tips Siaga Cuaca
                     </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-yellow-200">🎒 Tas Darurat:</h4>
-                        <ul className="space-y-1 text-sm text-white/90">
-                          <li>• Air minum untuk 3 hari</li>
-                          <li>• Makanan tahan lama</li>
-                          <li>• Obat-obatan penting</li>
-                          <li>• Senter dan baterai cadangan</li>
-                          <li>• Radio portabel</li>
-                          <li>• Dokumen penting (fotokopi)</li>
-                        </ul>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span>📱</span>
+                          <span className="text-white/80">Pantau update cuaca berkala</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>☂️</span>
+                          <span className="text-white/80">Siapkan payung/jas hujan</span>
+                        </div>
                       </div>
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-blue-200">📱 Informasi Penting:</h4>
-                        <ul className="space-y-1 text-sm text-white/90">
-                          <li>• Nomor telepon darurat</li>
-                          <li>• Jalur evakuasi terdekat</li>
-                          <li>• Tempat berkumpul keluarga</li>
-                          <li>• Lokasi shelter/posko</li>
-                          <li>• Pantau info resmi BMKG/BPBD</li>
-                          <li>• Koordinasi dengan RT/RW</li>
-                        </ul>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span>🏠</span>
+                          <span className="text-white/80">Amankan barang di luar rumah</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>🚗</span>
+                          <span className="text-white/80">Hati-hati berkendara</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {activeTab === 'Nomor Darurat' && (
-                <div className="space-y-6">
-                  {/* Emergency Contacts */}
-                  <EmergencyContacts location={location} />
-                  
-                  {/* Additional Emergency Info */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4 flex items-center">
-                      <span className="mr-2">📋</span>
-                      Informasi Darurat Tambahan
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-red-200">🚨 Nomor Nasional:</h4>
-                        <div className="space-y-2 text-sm text-white/90">
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Polisi:</span>
-                            <a href="tel:110" className="text-red-300 font-medium hover:text-red-200">110</a>
-                          </div>
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Pemadam Kebakaran:</span>
-                            <a href="tel:113" className="text-red-300 font-medium hover:text-red-200">113</a>
-                          </div>
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Ambulans:</span>
-                            <a href="tel:118" className="text-red-300 font-medium hover:text-red-200">118</a>
-                          </div>
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Search & Rescue:</span>
-                            <a href="tel:115" className="text-red-300 font-medium hover:text-red-200">115</a>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-blue-200">🏥 Layanan Medis:</h4>
-                        <div className="space-y-2 text-sm text-white/90">
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Poison Control:</span>
-                            <a href="tel:1500-019" className="text-blue-300 font-medium hover:text-blue-200">1500-019</a>
-                          </div>
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Kemenkes Hotline:</span>
-                            <a href="tel:1500-567" className="text-blue-300 font-medium hover:text-blue-200">1500-567</a>
-                          </div>
-                          <div className="flex justify-between items-center bg-white/10 p-2 rounded">
-                            <span>Crisis Center:</span>
-                            <a href="tel:021-500-454" className="text-blue-300 font-medium hover:text-blue-200">021-500-454</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab Lokasi - Location Information */}
+              {/* Tab Lokasi - Map Only */}
               {activeTab === 'Lokasi' && (
                 <div className="space-y-4">
                   {weatherData && weatherData.lokasi ? (
                     <>
-                      {/* Current Location Details */}
-                      <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                        <h3 className="text-white font-semibold mb-4 flex items-center">
-                          <span className="mr-2">📍</span>
-                          Informasi Lokasi Saat Ini
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Desa:</span>
-                              <span className="text-white font-medium">{location.desa || weatherData.lokasi.desa || 'Belum dipilih'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Kecamatan:</span>
-                              <span className="text-white font-medium">{location.kecamatan || weatherData.lokasi.adm3 || '-'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Kabupaten:</span>
-                              <span className="text-white font-medium">{location.kabupaten || weatherData.lokasi.adm2 || '-'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Provinsi:</span>
-                              <span className="text-white font-medium">{location.provinsi || weatherData.lokasi.adm1 || '-'}</span>
-                            </div>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Koordinat:</span>
-                              <span className="text-white font-medium text-xs">
-                                {weatherData.lokasi.lat && weatherData.lokasi.lon ? 
-                                  `${weatherData.lokasi.lat.toFixed(4)}, ${weatherData.lokasi.lon.toFixed(4)}` : 
-                                  'Tidak tersedia'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Zona Waktu:</span>
-                              <span className="text-white font-medium">WIB (UTC+7)</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Ketinggian:</span>
-                              <span className="text-white font-medium">~ 100m mdpl</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Iklim:</span>
-                              <span className="text-white font-medium">Tropis</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Location Services */}
-                      <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                        <h3 className="text-white font-semibold mb-4 flex items-center">
-                          <span className="mr-2">🏥</span>
-                          Fasilitas Terdekat
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="text-center p-3 bg-white/10 rounded-lg">
-                            <span className="text-2xl block mb-2">🏥</span>
-                            <span className="text-sm text-white/90">RS Terdekat</span>
-                            <p className="text-xs text-white/70 mt-1">~2.5 km</p>
-                          </div>
-                          <div className="text-center p-3 bg-white/10 rounded-lg">
-                            <span className="text-2xl block mb-2">🚓</span>
-                            <span className="text-sm text-white/90">Polsek</span>
-                            <p className="text-xs text-white/70 mt-1">~1.8 km</p>
-                          </div>
-                          <div className="text-center p-3 bg-white/10 rounded-lg">
-                            <span className="text-2xl block mb-2">🚒</span>
-                            <span className="text-sm text-white/90">Pemadam</span>
-                            <p className="text-xs text-white/70 mt-1">~3.2 km</p>
-                          </div>
-                          <div className="text-center p-3 bg-white/10 rounded-lg">
-                            <span className="text-2xl block mb-2">⛽</span>
-                            <span className="text-sm text-white/90">SPBU</span>
-                            <p className="text-xs text-white/70 mt-1">~1.2 km</p>
-                          </div>
-                        </div>
-                      </div>
-
                       {/* Map View */}
                       <div className="backdrop-blur-md bg-white/20 rounded-xl p-4 border border-white/20">
-                        <h3 className="text-white font-semibold mb-3 flex items-center drop-shadow">
-                          <span className="mr-2">🗺️</span>
-                          Map View
-                        </h3>
                         <MapView data={weatherData.lokasi.lat && weatherData.lokasi.lon ? [{
                           data: {
                             lokasi: weatherData.lokasi,
@@ -1149,167 +1327,6 @@ const Home = () => {
                       <p className="text-white/80 drop-shadow">Search for a location to view map details</p>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Tab Wind - Wind Information */}
-              {activeTab === 'Wind' && (
-                <div className="space-y-4">
-                  {/* Wind Speed & Direction */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 text-center">
-                      <h3 className="text-white font-semibold mb-4 flex items-center justify-center">
-                        <span className="mr-2">💨</span>
-                        Kecepatan Angin
-                      </h3>
-                      <div className="text-4xl font-bold text-white mb-2">
-                        {currentWeather.wind?.speed || '0'}
-                      </div>
-                      <p className="text-white/80">km/h</p>
-                      <div className="mt-4 text-sm text-white/70">
-                        Kategori: {getWindCategory(currentWeather.wind?.speed || 0)}
-                      </div>
-                    </div>
-                    
-                    <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 text-center">
-                      <h3 className="text-white font-semibold mb-4 flex items-center justify-center">
-                        <span className="mr-2">🧭</span>
-                        Arah Angin
-                      </h3>
-                      <div className="text-4xl mb-2">
-                        {getWindDirection(currentWeather.wind?.direction || 0)}
-                      </div>
-                      <p className="text-white/80">{currentWeather.wind?.direction || 0}°</p>
-                      <div className="mt-4 text-sm text-white/70">
-                        {getWindDirectionText(currentWeather.wind?.direction || 0)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Wind Tips */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4">Tips Angin Kencang</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <ul className="space-y-2 text-sm text-white/90">
-                        <li>• Hindari pohon tinggi saat angin kencang</li>
-                        <li>• Amankan barang-barang ringan</li>
-                        <li>• Tutup jendela dan pintu dengan rapat</li>
-                      </ul>
-                      <ul className="space-y-2 text-sm text-white/90">
-                        <li>• Hindari aktivitas di luar ruangan</li>
-                        <li>• Parkir kendaraan di tempat aman</li>
-                        <li>• Siapkan penerangan cadangan</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab Humidity - Humidity Information */}
-              {activeTab === 'Humidity' && (
-                <div className="space-y-4">
-                  {/* Current Humidity */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30 text-center">
-                    <h3 className="text-white font-semibold mb-4 flex items-center justify-center">
-                      <span className="mr-2">💧</span>
-                      Kelembapan Udara
-                    </h3>
-                    <div className="text-6xl font-bold text-white mb-4">
-                      {currentWeather.humidity || '50'}%
-                    </div>
-                    <div className="text-sm text-white/70 mb-4">
-                      Kategori: {getHumidityCategory(currentWeather.humidity || 50)}
-                    </div>
-                    
-                    {/* Humidity Meter */}
-                    <div className="w-full bg-white/20 rounded-full h-4 mb-4">
-                      <div 
-                        className="bg-gradient-to-r from-yellow-400 to-blue-500 h-4 rounded-full transition-all duration-500"
-                        style={{ width: `${currentWeather.humidity || 50}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* Humidity Tips */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4 flex items-center">
-                      <span className="mr-2">💡</span>
-                      Tips Kelembapan
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium text-blue-200 mb-2">Kelembapan Tinggi (&gt;70%):</h4>
-                        <ul className="space-y-1 text-sm text-white/90">
-                          <li>• Gunakan dehumidifier</li>
-                          <li>• Pastikan ventilasi baik</li>
-                          <li>• Hindari pengeringan dalam ruangan</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-yellow-200 mb-2">Kelembapan Rendah (&lt;30%):</h4>
-                        <ul className="space-y-1 text-sm text-white/90">
-                          <li>• Gunakan humidifier</li>
-                          <li>• Minum air lebih banyak</li>
-                          <li>• Gunakan pelembap kulit</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab Prakiraan - Extended Forecast */}
-              {activeTab === 'Prakiraan' && (
-                <div className="space-y-4">
-                  {/* 7-Day Forecast */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4 flex items-center">
-                      <span className="mr-2">📅</span>
-                      Prakiraan 7 Hari
-                    </h3>
-                    <div className="space-y-3">
-                      {weeklyForecast.map((day, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
-                          <div className="flex items-center">
-                            <span className="text-2xl mr-3">{day.icon}</span>
-                            <div>
-                              <p className="text-white font-medium">{day.day}</p>
-                              <p className="text-white/70 text-sm">Cerah berawan</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-white font-bold">{day.temp}</p>
-                            <p className="text-white/70 text-sm">22°</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Weather Patterns */}
-                  <div className="backdrop-blur-xl bg-white/20 rounded-xl p-6 border border-white/30">
-                    <h3 className="text-white font-semibold mb-4 flex items-center">
-                      <span className="mr-2">📊</span>
-                      Pola Cuaca Bulanan
-                    </h3>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-3 bg-white/10 rounded-lg">
-                        <span className="text-2xl block mb-2">☀️</span>
-                        <p className="text-sm text-white/90">Cerah</p>
-                        <p className="text-xs text-white/70">15 hari</p>
-                      </div>
-                      <div className="p-3 bg-white/10 rounded-lg">
-                        <span className="text-2xl block mb-2">⛅</span>
-                        <p className="text-sm text-white/90">Berawan</p>
-                        <p className="text-xs text-white/70">10 hari</p>
-                      </div>
-                      <div className="p-3 bg-white/10 rounded-lg">
-                        <span className="text-2xl block mb-2">🌧️</span>
-                        <p className="text-sm text-white/90">Hujan</p>
-                        <p className="text-xs text-white/70">5 hari</p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
             </section>
