@@ -95,15 +95,28 @@ GET /api/health
 
 ## 🌐 Deployment
 
+### 🚀 Live Demo
+**Aplikasi sudah ter-deploy dan dapat diakses di:**
+- **URL**: [https://hujangakya.vercel.app](https://hujangakya.vercel.app)
+- **Status**: ✅ Production Ready
+- **Platform**: Vercel (Serverless)
+
 ### Production Build
 ```bash
 # Frontend
 cd frontend
 npm run build
 
-# Serve static files
+# Serve static files locally
 npx serve -s build -l 3000
 ```
+
+### Vercel Deployment
+Proyek ini dikonfigurasi untuk auto-deployment di Vercel dengan:
+- **Frontend**: Static build dari React
+- **Backend**: Serverless functions di `/api/*`
+- **Domain**: hujangakya.vercel.app
+- **Auto-deploy**: Setiap push ke branch `main`
 
 ### Environment Variables
 ```bash
@@ -112,16 +125,37 @@ PORT=5000
 BMKG_API_URL=https://api.bmkg.go.id
 NODE_ENV=production
 
-# Frontend (.env file)  
-REACT_APP_API_URL=http://localhost:5000
+# Frontend (.env.production file)  
+REACT_APP_API_URL=https://hujangakya.vercel.app
 REACT_APP_MAP_CENTER_LAT=-6.2
 REACT_APP_MAP_CENTER_LNG=106.816667
+GENERATE_SOURCEMAP=false
 ```
 
+### Vercel Configuration
+File `vercel.json` dikonfigurasi untuk:
+- **Static Build**: Frontend React dengan create-react-app
+- **Serverless Functions**: API endpoints di folder `/api/`
+- **Custom Routes**: Routing untuk SPA dan API
+- **CORS**: Configured untuk production domain
+
+### API Endpoints (Production)
+- `GET https://hujangakya.vercel.app/api/health` - Health check
+- `GET https://hujangakya.vercel.app/api/weather?adm4=<code>` - Weather by ADM4
+- `GET https://hujangakya.vercel.app/api/weather?desa=<name>` - Weather by village name
+- `GET https://hujangakya.vercel.app/api/search-desa?q=<query>` - Search villages
+- `GET https://hujangakya.vercel.app/api/desa` - Get all villages
+
 ### Hosting Options
-- **Frontend**: Netlify, Vercel, GitHub Pages
-- **Backend**: Heroku, Railway, DigitalOcean
-- **Full-Stack**: Railway, Render, AWS Amplifyformasi cuaca terkini dengan antarmuka yang mudah digunakan.
+- **Frontend**: ✅ **Vercel** (Current), Netlify, GitHub Pages
+- **Backend**: ✅ **Vercel Serverless** (Current), Heroku, Railway, DigitalOcean
+- **Full-Stack**: ✅ **Vercel** (Current), Railway, Render, AWS Amplify
+
+### Deployment Process
+1. **Automatic**: Push ke GitHub main branch triggers auto-deployment
+2. **Manual**: Deploy via Vercel CLI atau dashboard
+3. **Build Time**: ~2-3 menit untuk complete deployment
+4. **Zero Downtime**: Vercel's atomic deploymentsformasi cuaca terkini dengan antarmuka yang mudah digunakan.
 
 ## 🌟 Fitur Utama
 
