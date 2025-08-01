@@ -1,0 +1,16 @@
+{
+  "name": "hujangakya-api",
+  "version": "1.0.0",
+  "description": "Serverless API functions for HujanGakYa",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
