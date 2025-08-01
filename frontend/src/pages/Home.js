@@ -6,6 +6,11 @@ import WeatherVideoBackground from '../components/WeatherVideoBackground';
 import { generateAlerts } from '../utils/alertSystem';
 import { AlertBanner } from '../components/AlertComponents';
 
+// API Configuration
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '' // Untuk production di Vercel (same domain)
+  : process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Untuk development
+
 // Mock data untuk fallback
 const mockWeatherData = {
   lokasi: {
@@ -170,7 +175,7 @@ const Home = () => {
 
         
         // Try to search by desa name first
-        const searchResponse = await fetch(`http://localhost:5000/api/weather/search?desa=${encodeURIComponent(searchQuery)}`);
+        const searchResponse = await fetch(`${API_BASE_URL}/api/weather/search?desa=${encodeURIComponent(searchQuery)}`);
         const searchData = await searchResponse.json();
         
 
@@ -233,7 +238,7 @@ const Home = () => {
     // Show suggestions for any input >= 1 character
     try {
       // Try API call first (using real data from desa.json)
-      const response = await fetch(`http://localhost:5000/api/search-desa?q=${encodeURIComponent(value)}&limit=12`);
+      const response = await fetch(`${API_BASE_URL}/api/search-desa?q=${encodeURIComponent(value)}&limit=12`);
       
       if (response.ok) {
         const data = await response.json();
